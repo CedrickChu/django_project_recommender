@@ -1,6 +1,10 @@
 # admin.py
 from django.contrib import admin
-from .models import Skill, Hobby, Personality, Employees, EmployeeHobby, EmployeePersonality, EmployeeSkills
+from .models import (
+    Skill, Hobby, Personality, Employees, EmployeeHobby,
+    EmployeePersonality, EmployeeSkills, Institution,
+    Training, EmployeeTraining
+)
 
 @admin.register(Skill)
 class SkillAdmin(admin.ModelAdmin):
@@ -14,27 +18,25 @@ class HobbyAdmin(admin.ModelAdmin):
 class PersonalityAdmin(admin.ModelAdmin):
     list_display = ('code', 'name')
 
+admin.site.register(Institution)
+
+
+@admin.register(Employees)
+class EmployeeAdmin(admin.ModelAdmin):
+    list_display = ('first_name', 'middle_name', 'last_name', 'institution')
+    search_fields = ('first_name', 'last_name')
+
 class EmployeeHobbyInline(admin.TabularInline):
     model = EmployeeHobby
 
 class EmployeePersonalityInline(admin.TabularInline):
     model = EmployeePersonality
-    
+
 class EmployeeSkillsInline(admin.TabularInline):
     model = EmployeeSkills
 
-@admin.register(Employees)
-class EmployeeAdmin(admin.ModelAdmin):
-    list_display = ('first_name', 'middle_name', 'last_name', 'get_personality')
-    search_fields = ('first_name', 'last_name')
-    inlines = [EmployeeHobbyInline, EmployeePersonalityInline, EmployeeSkillsInline]
-
-    def get_personality(self, obj):
-        if obj.personality:
-            return obj.personality.name
-        return None
-
-    get_personality.short_description = 'Personality'
+class EmployeeTrainingInline(admin.TabularInline):
+    model = EmployeeTraining
 
 @admin.register(EmployeeHobby)
 class EmployeeHobbyAdmin(admin.ModelAdmin):
@@ -46,4 +48,12 @@ class EmployeePersonalityAdmin(admin.ModelAdmin):
 
 @admin.register(EmployeeSkills)
 class EmployeeSkillsAdmin(admin.ModelAdmin):
-    pass  
+    list_display = ('employee', 'skill', 'skill_level')
+
+@admin.register(Training)
+class TrainingAdmin(admin.ModelAdmin):
+    list_display = ('training_title', 'training_venue', 'start_date', 'end_date', 'institution')
+
+@admin.register(EmployeeTraining)
+class EmployeeTrainingAdmin(admin.ModelAdmin):
+    list_display = ('employee', 'training', 'participation_type')
