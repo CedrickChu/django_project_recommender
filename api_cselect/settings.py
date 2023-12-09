@@ -76,12 +76,12 @@ WSGI_APPLICATION = 'api_cselect.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
         'NAME': 'hrm_project',
-        'USERNAME': 'root',
+        'USER': 'root',
         'PASSWORD': 'root',
-        'HOST': 'localhost',
-        'PORT': '3306',
+        'HOST': 'localhost',  
+        'PORT': '3306',       
     }
 }
 

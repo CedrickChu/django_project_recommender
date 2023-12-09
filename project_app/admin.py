@@ -1,6 +1,6 @@
 # admin.py
 from django.contrib import admin
-from .models import Skill, Hobby, Personality, Employee, EmployeeHobby, EmployeePersonality
+from .models import Skill, Hobby, Personality, Employees, EmployeeHobby, EmployeePersonality, EmployeeSkills
 
 @admin.register(Skill)
 class SkillAdmin(admin.ModelAdmin):
@@ -8,7 +8,7 @@ class SkillAdmin(admin.ModelAdmin):
 
 @admin.register(Hobby)
 class HobbyAdmin(admin.ModelAdmin):
-    model = EmployeeHobby
+    pass
 
 @admin.register(Personality)
 class PersonalityAdmin(admin.ModelAdmin):
@@ -19,11 +19,22 @@ class EmployeeHobbyInline(admin.TabularInline):
 
 class EmployeePersonalityInline(admin.TabularInline):
     model = EmployeePersonality
+    
+class EmployeeSkillsInline(admin.TabularInline):
+    model = EmployeeSkills
 
-@admin.register(Employee)
+@admin.register(Employees)
 class EmployeeAdmin(admin.ModelAdmin):
-    list_display = ('emp_id', 'first_name', 'last_name', 'start_date', 'exit_date')
-    inlines = [EmployeeHobbyInline, EmployeePersonalityInline]
+    list_display = ('first_name', 'middle_name', 'last_name', 'get_personality')
+    search_fields = ('first_name', 'last_name')
+    inlines = [EmployeeHobbyInline, EmployeePersonalityInline, EmployeeSkillsInline]
+
+    def get_personality(self, obj):
+        if obj.personality:
+            return obj.personality.name
+        return None
+
+    get_personality.short_description = 'Personality'
 
 @admin.register(EmployeeHobby)
 class EmployeeHobbyAdmin(admin.ModelAdmin):
@@ -32,3 +43,7 @@ class EmployeeHobbyAdmin(admin.ModelAdmin):
 @admin.register(EmployeePersonality)
 class EmployeePersonalityAdmin(admin.ModelAdmin):
     list_display = ('employee', 'personality')
+
+@admin.register(EmployeeSkills)
+class EmployeeSkillsAdmin(admin.ModelAdmin):
+    pass  

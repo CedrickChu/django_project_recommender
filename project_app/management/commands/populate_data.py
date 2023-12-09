@@ -1,6 +1,6 @@
 # populate_data/management/commands/populate_employee_data.py
 from django.core.management.base import BaseCommand
-from project_app.models import Employee, Hobby, Personality, EmployeeHobby, EmployeePersonality
+from project_app.models import Employees, Hobby, Personality, EmployeeHobby, EmployeePersonality
 import random
 
 class Command(BaseCommand):
@@ -41,19 +41,21 @@ class Command(BaseCommand):
                 name=hobby_data["name"],
             )
 
-        Personality.objects.bulk_create([Personality(**data) for data in personalities_data])
+        for personality_data in personalities_data:
+            personality, created = Personality.objects.get_or_create(
+                code=personality_data["code"],
+                defaults={"name": personality_data["name"]}
+            )
 
-        employees = Employee.objects.all()
+        employees = Employees.objects.all()
 
         for employee in employees:
             # Randomly select hobbies for the employee
-            selected_hobbies = random.sample(Hobby.objects.all(), k=random.randint(1, len(hobbies_data)))
-            EmployeeHobby.objects.bulk_create([EmployeeHobby(employee=employee, hobby=hobby) for hobby in selected_hobbies])
+            selected_hobbies = random.sample(list(Hobby.objects.all()), k=random.randint(1, len(hobbies_data)))
+            employee.hobbies.set(selected_hobbies)
 
-            # Randomly select personalities for the employee
-            selected_personalities = random.sample(Personality.objects.all(), k=random.randint(1, len(personalities_data)))
-            EmployeePersonality.objects.bulk_create([
-                EmployeePersonality(employee=employee, personality=personality) for personality in selected_personalities
-            ])
+            # Randomly select ONE personality for the employee using random.choice
+            selected_personality = random.choice(list(Personality.objects.all()))
+            employee.personalities.set([selected_personality])
 
         self.stdout.write(self.style.SUCCESS('Data populated successfully.'))
