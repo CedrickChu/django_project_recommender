@@ -21,6 +21,7 @@ class Personality(models.Model):
         return f"{self.name} - {self.code}"
     
 class Institution(models.Model):
+    id = models.AutoField(primary_key=True)
     Institution_name = models.CharField(max_length=100, unique=True)
 
     def __str__(self):
@@ -31,7 +32,7 @@ class Employees(models.Model):
     middle_name = models.CharField(max_length=50, null=True)
     last_name = models.CharField(max_length=50)
     hobbies = models.ManyToManyField(Hobby, through='EmployeeHobby')
-    personality = models.ManyToManyField(Personality, through='EmployeePersonality')
+    personality = models.ForeignKey(Personality, on_delete=models.SET_NULL, null=True)
     institution = models.ForeignKey(Institution, on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
@@ -56,7 +57,7 @@ class EmployeeHobby(models.Model):
         return f"{self.employee} - {self.hobby}"
 
 class EmployeePersonality(models.Model):
-    employee = models.ForeignKey(Employees, on_delete=models.CASCADE)
+    employee = models.OneToOneField(Employees, on_delete=models.CASCADE)
     personality = models.ForeignKey(Personality, on_delete=models.CASCADE)
 
     def __str__(self):
@@ -83,5 +84,8 @@ class EmployeeTraining(models.Model):
 
     def __str__(self):
         return f"{self.employee} - {self.training} - {self.participation_type}"
+
+        
+
 
 

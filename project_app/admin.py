@@ -27,7 +27,7 @@ class InstitutionAdmin(admin.ModelAdmin):
 
 @admin.register(Employees)
 class EmployeeAdmin(admin.ModelAdmin):
-    list_display = ('first_name', 'middle_name', 'last_name', 'institution')
+    list_display = ('first_name', 'middle_name', 'last_name', 'institution', 'personality')
     search_fields = ('first_name', 'middle_name', 'last_name', 'institution__Institution_name')
 
 class EmployeeHobbyInline(admin.TabularInline):
@@ -46,7 +46,7 @@ class EmployeeTrainingInline(admin.TabularInline):
 class EmployeeHobbyAdmin(admin.ModelAdmin):
     list_display = ('employee', 'hobby')
     search_fields = ('employee__first_name', 'employee__last_name', 'hobby__name')
-
+    
 @admin.register(EmployeePersonality)
 class EmployeePersonalityAdmin(admin.ModelAdmin):
     list_display = ('employee', 'personality')
