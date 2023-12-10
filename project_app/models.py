@@ -39,7 +39,7 @@ class Employees(models.Model):
         return f"{self.first_name} {self.last_name}"
 
 class EmployeeSkills(models.Model):
-    employee = models.OneToOneField('project_app.Employees', on_delete=models.CASCADE, primary_key=True)
+    employee = models.ForeignKey('project_app.Employees', on_delete=models.CASCADE, primary_key=True)
     skill = models.ForeignKey('project_app.Skill', on_delete=models.CASCADE)
     skill_level = models.CharField(max_length=250)
     
