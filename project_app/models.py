@@ -39,9 +39,12 @@ class Employees(models.Model):
         return f"{self.first_name} {self.last_name}"
 
 class EmployeeSkills(models.Model):
-    employee = models.ForeignKey('Employees', on_delete=models.CASCADE, primary_key=True)
+    employee = models.OneToOneField('Employees', on_delete=models.CASCADE, primary_key=True)
     skill = models.ForeignKey('Skill', on_delete=models.CASCADE)
     skill_level = models.CharField(max_length=250)
+    
+    class Meta:
+        unique_together = ('employee', 'skill')
 
     def __str__(self):
         return f"{self.employee} - {self.skill} - {self.skill_level}"
@@ -72,9 +75,12 @@ class Training(models.Model):
         return self.training_title
 
 class EmployeeTraining(models.Model):
-    employee = models.ForeignKey(Employees, on_delete=models.CASCADE)
+    employee = models.OneToOneField(Employees, on_delete=models.CASCADE, primary_key=True)
     training = models.ForeignKey(Training, on_delete=models.CASCADE)
     participation_type = models.CharField(max_length=50)
+    
+    class Meta:
+        unique_together = ('employee', 'training')
 
     def __str__(self):
         return f"{self.employee} - {self.training} - {self.participation_type}"

@@ -35,6 +35,8 @@ class Command(BaseCommand):
             {"code": "ENFJ", "name": "The Teacher"},
             {"code": "ENTJ", "name": "The Commander"},
         ]
+        
+        
 
         for hobby_data in hobbies_data:
             hobby, created = Hobby.objects.get_or_create(
