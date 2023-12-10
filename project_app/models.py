@@ -1,4 +1,3 @@
-# models.py
 from django.db import models
 
 class Hobby(models.Model):
@@ -12,14 +11,14 @@ class Skill(models.Model):
     skill_description = models.TextField()
 
     def __str__(self):
-        return self.skill_type
+        return f"{self.skill_type}"
     
 class Personality(models.Model):
     code = models.CharField(max_length=10, unique=True)
     name = models.CharField(max_length=50, unique=True)
 
     def __str__(self):
-        return self.name
+        return f"{self.name} - {self.code}"
     
 class Institution(models.Model):
     Institution_name = models.CharField(max_length=100, unique=True)
@@ -39,8 +38,8 @@ class Employees(models.Model):
         return f"{self.first_name} {self.last_name}"
 
 class EmployeeSkills(models.Model):
-    employee = models.OneToOneField('Employees', on_delete=models.CASCADE, primary_key=True)
-    skill = models.ForeignKey('Skill', on_delete=models.CASCADE)
+    employee = models.OneToOneField('project_app.Employees', on_delete=models.CASCADE, primary_key=True)
+    skill = models.ForeignKey('project_app.Skill', on_delete=models.CASCADE)
     skill_level = models.CharField(max_length=250)
     
     class Meta:
@@ -84,3 +83,5 @@ class EmployeeTraining(models.Model):
 
     def __str__(self):
         return f"{self.employee} - {self.training} - {self.participation_type}"
+
+
