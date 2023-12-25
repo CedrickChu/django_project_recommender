@@ -5,6 +5,7 @@ from .models import (
     EmployeePersonality, EmployeeSkills, Institution,
     Training, EmployeeTraining
 )
+from .forms import EmployeeForm
 
 @admin.register(Skill)
 class SkillAdmin(admin.ModelAdmin):
@@ -27,8 +28,10 @@ class InstitutionAdmin(admin.ModelAdmin):
 
 @admin.register(Employees)
 class EmployeeAdmin(admin.ModelAdmin):
+    form = EmployeeForm
     list_display = ('first_name', 'middle_name', 'last_name', 'institution', 'personality')
     search_fields = ('first_name', 'middle_name', 'last_name', 'institution__Institution_name')
+    
 
 class EmployeeHobbyInline(admin.TabularInline):
     model = EmployeeHobby
@@ -44,18 +47,29 @@ class EmployeeTrainingInline(admin.TabularInline):
 
 @admin.register(EmployeeHobby)
 class EmployeeHobbyAdmin(admin.ModelAdmin):
-    list_display = ('employee', 'hobby')
+    list_display = ('employee', 'get_hobby_names')
     search_fields = ('employee__first_name', 'employee__last_name', 'hobby__name')
+
+    def get_hobby_names(self, obj):
+        return ", ".join([str(hobby.name) for hobby in obj.employee.hobbies.all()])
+
+    get_hobby_names.short_description = 'Hobbies'
     
 @admin.register(EmployeePersonality)
 class EmployeePersonalityAdmin(admin.ModelAdmin):
     list_display = ('employee', 'personality')
     search_fields = ('employee__first_name', 'employee__last_name', 'personality__name')
 
+
 @admin.register(EmployeeSkills)
 class EmployeeSkillsAdmin(admin.ModelAdmin):
-    list_display = ('employee', 'skill', 'skill_level')
-    search_fields = ('employee__first_name', 'employee__last_name', 'skill__skill_type')
+    list_display = ('employee', 'get_skills_display', 'skill_level')
+    search_fields = ('employee__first_name', 'employee__last_name', 'skill_level')
+
+    def get_skills_display(self, obj):
+        return ", ".join([str(skill.skill_type) for skill in obj.employee.skills.all()])
+
+    get_skills_display.short_description = 'Skills'
 
 @admin.register(Training)
 class TrainingAdmin(admin.ModelAdmin):

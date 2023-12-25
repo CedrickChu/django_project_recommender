@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<div class="content-center">
+    <div class="container container-fluid mx-auto">
+        <h2>Add Training</h2>
+        <form method="post" action="">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="training_title">Training Title:</label>
+                <input class="form-control" type="text" name="training_title" value="" required>
+            </div>
+
+            <div class="form-group">
+                <label for="training_venue">Training Venue:</label>
+                <input class="form-control" type="text" name="training_venue" value="" required>
+            </div>
+
+            <div class="form-group">
+                <label for="training_type">Training Type:</label>
+                <input class="form-control" type="text" name="training_type" value="" required>
+            </div>
+
+            <div class="row">
+                <div class="col">
+                    <div class="form-group">
+                        <label for="start_date">Start Date:</label>
+                        <input class="form-control" type="date" name="start_date" value="" required>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-group">
+                        <label for="end_date">End Date:</label>
+                        <input class="form-control" type="date" name="end_date" value="" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="institution">Institution:</label>
+                <select class="form-control" name="institution" required>
+                    {% for institution in institutions %}
+                        <option value="{{ institution.id }}">{{ institution.Institution_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <br>
+            <button type="submit" style='margin-right:20px;' class="btn btn-danger">Add Training</button>
+            <a href="{% url 'training_view' %}" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

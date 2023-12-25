@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<div class="content-center">
+    <div class="container container-fluid mx-auto">
+        <h2>Edit Training</h2>
+        <form method="post" action="">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="training_title">Training Title:</label>
+                <input class="form-control" type="text" name="training_title" value="{{ training.training_title }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="training_venue">Training Venue:</label>
+                <input class="form-control" type="text" name="training_venue" value="{{ training.training_venue }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="training_type">Training Type:</label>
+                <input class="form-control" type="text" name="training_type" value="{{ training.training_type }}" required>
+            </div>
+
+            <div class="row">
+                <div class="col">
+                    <div class="form-group">
+                        <label for="start_date">Start Date:</label>
+                        <input class="form-control" type="date" name="start_date" value="{{ training.start_date|date:'Y-m-d' }}" required>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-group">
+                        <label for="end_date">End Date:</label>
+                        <input class="form-control" type="date" name="end_date" value="{{ training.end_date|date:'Y-m-d' }}" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="institution">Institution:</label>
+                <select class="form-control" name="institution" required>
+                    {% for institution in institutions %}
+                        <option value="{{ institution.id }}" {% if training.institution.id == institution.id %}selected{% endif %}>
+                            {{ institution.Institution_name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <br>
+            <button type="submit" style='margin-right:20px;' class="btn btn-danger">Save Changes</button>
+            <a href="{% url 'training_view' %}" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}
