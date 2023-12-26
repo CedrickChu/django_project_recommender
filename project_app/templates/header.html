@@ -1,3 +1,4 @@
+{% load static %}
 <header class="header container">
       <ul class="header-items">
         <li class="header-items">
@@ -5,7 +6,7 @@
             <div class="sidebar" id="mySidebar">
                 <div class="logo text-center">
                     <a class="navbar-brand" href="https://github.com/CedrickChu">
-                    <img src="../static/images/chu.png" alt="My Logo" width="80" height="80">
+                    <img src="{% static 'images/chu.png' %}" alt="My Logo" width="80" height="80">
                 </div>
                 <a href="#">DASHBOARD</a>
                 <a href="{% url 'employee_view' %}">EMPLOYEE</a>
@@ -14,7 +15,7 @@
                 <a href="{% url 'project_view' %}">CREATE PROJECT</a>
             </div>
             <div id="overlay" onclick="w3_open()">
-              <script src="../js/sidebar.js"></script>
+              <script src="{% static 'js/sidebar.js' %}"></script>
             </div>
         </li>
         <nav>

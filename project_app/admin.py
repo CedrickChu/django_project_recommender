@@ -3,7 +3,7 @@ from django.contrib import admin
 from .models import (
     Skill, Hobby, Personality, Employees, EmployeeHobby,
     EmployeePersonality, EmployeeSkills, Institution,
-    Training, EmployeeTraining
+    Training, EmployeeTraining, Project
 )
 from .forms import EmployeeForm
 
@@ -32,6 +32,7 @@ class EmployeeAdmin(admin.ModelAdmin):
     list_display = ('first_name', 'middle_name', 'last_name', 'institution', 'personality')
     search_fields = ('first_name', 'middle_name', 'last_name', 'institution__Institution_name')
     
+
 
 class EmployeeHobbyInline(admin.TabularInline):
     model = EmployeeHobby
@@ -80,3 +81,8 @@ class TrainingAdmin(admin.ModelAdmin):
 class EmployeeTrainingAdmin(admin.ModelAdmin):
     list_display = ('employee', 'training', 'participation_type')
     search_fields = ('employee__first_name', 'employee__last_name', 'training__training_title')
+
+@admin.register(Project)
+class ProjectAdmin(admin.ModelAdmin):
+    list_display = ('id', 'title', 'start_date', 'end_date')
+    filter_horizontal = ('required_skills',)

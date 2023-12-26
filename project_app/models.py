@@ -86,6 +86,17 @@ class EmployeeTraining(models.Model):
 
     def __str__(self):
         return f"{self.employee} - {self.training} - {self.participation_type}"
+    
+class Project(models.Model):
+    title = models.CharField(max_length=100)
+    description = models.TextField()
+    required_skills = models.ManyToManyField(Skill)
+    preferred_hobbies = models.ManyToManyField(Hobby)
+    start_date = models.DateField(null=True, blank=True)
+    end_date = models.DateField(null=True, blank=True)
+
+    def __str__(self):
+        return self.title
 
         
 
