@@ -1,40 +1,40 @@
-from django.db.models import Q
-from collections import defaultdict
-from .models import Employees, EmployeePersonality, EmployeeHobby
+def calculate_score(employee, project):
+    skill_weight = 1.5
+    personality_weight = 0.2
+    hobbies_weight = 0.5
 
-class ProjectEmployeeMatcher:
-    @staticmethod
-    def get_common_attributes(employees, model, attribute):
-        attribute_sets = [set(model.objects.filter(employee=employee).values_list(attribute, flat=True)) for employee in employees]
-        common_attributes = set.intersection(*attribute_sets) if attribute_sets else set()
-        return common_attributes
+    total_skills = len(project.required_skills.all())
+    employee_skills = employee.skills.filter(id__in=project.required_skills.values_list('id', flat=True))
+    skill_score = (len(employee_skills) / total_skills) * 100 * skill_weight if total_skills > 0 else 0
 
-    @staticmethod
-    def recommend_employees_for_project(project):
-        required_skills = set(project.required_skills.values_list('id', flat=True))
-        employee_scores = defaultdict(int)
+    if employee.personality:
+        personality_score = 100 * personality_weight if employee.personality in project.preferred_personalities.all() else 0
+    else:
+        personality_score = 0
 
-        for employee in Employees.objects.all():
-            employee_skills = set(employee.skills.values_list('id', flat=True))
-            score = len(required_skills.intersection(employee_skills))
-            employee_scores[employee] = score
+    employee_hobbies = employee.hobbies.all()
+    total_hobbies = len(project.preferred_hobbies.all())
+    matched_hobbies = employee_hobbies.filter(id__in=project.preferred_hobbies.values_list('id', flat=True))
+    hobbies_score = (len(matched_hobbies) / total_hobbies) * 100 * hobbies_weight if total_hobbies > 0 else 0
 
-        sorted_employees = sorted(employee_scores.items(), key=lambda x: x[1], reverse=True)[:15]
-        top_3_employees = [employee for employee, _ in sorted_employees]
+    total_score = skill_score + personality_score + hobbies_score
 
-        common_hobbies = ProjectEmployeeMatcher.get_common_attributes(top_3_employees, EmployeeHobby, 'hobby_id')
-        common_personalities = ProjectEmployeeMatcher.get_common_attributes(top_3_employees, EmployeePersonality, 'personality_id')
+    scores = {
+        'skill_score': skill_score,
+        'personality_score': personality_score,
+        'hobbies_score': hobbies_score,
+        'total_score': total_score
+    }
 
-        # Step 3: Filter next set of employees based on common hobbies and personalities
-        next_employees_query = Q()
-        for hobby_id in common_hobbies:
-            next_employees_query |= Q(employeehobby__hobby_id=hobby_id)
-        for personality_id in common_personalities:
-            next_employees_query |= Q(employeepersonality__personality_id=personality_id)
+    return scores
 
-        next_best_employees = Employees.objects.filter(next_employees_query).exclude(id__in=[e.id for e in top_3_employees]).distinct()[:5]
 
-        # Step 4: Combine top 3 with next best 12 employees
-        final_recommendations = top_3_employees + list(next_best_employees)
+def get_top_recommendations(project, employees, top_count=20):
+    scored_employees = [(employee, calculate_score(employee, project)) for employee in employees]
 
-        return final_recommendations
+    sorted_scores = sorted(scored_employees, key=lambda x: x[1]['total_score'], reverse=True)
+
+    top_recommendations = sorted_scores[:top_count]
+
+    recommendations = [{'employee': emp, **scores} for emp, scores in top_recommendations]
+    return recommendations

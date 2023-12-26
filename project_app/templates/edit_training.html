@@ -9,30 +9,30 @@
 
             <div class="form-group">
                 <label for="training_title">Training Title:</label>
-                <input class="form-control" type="text" name="training_title" value="{{ training.training_title }}" required>
+                <input class="form-control" type="text" name="training_title" value="{{ training.training_title }}" required><br>
             </div>
 
             <div class="form-group">
                 <label for="training_venue">Training Venue:</label>
-                <input class="form-control" type="text" name="training_venue" value="{{ training.training_venue }}" required>
+                <input class="form-control" type="text" name="training_venue" value="{{ training.training_venue }}" required><br>
             </div>
 
             <div class="form-group">
                 <label for="training_type">Training Type:</label>
-                <input class="form-control" type="text" name="training_type" value="{{ training.training_type }}" required>
+                <input class="form-control" type="text" name="training_type" value="{{ training.training_type }}" required><br>
             </div>
 
             <div class="row">
                 <div class="col">
                     <div class="form-group">
                         <label for="start_date">Start Date:</label>
-                        <input class="form-control" type="date" name="start_date" value="{{ training.start_date|date:'Y-m-d' }}" required>
+                        <input class="form-control" type="date" name="start_date" value="{{ training.start_date|date:'Y-m-d' }}" required><br>
                     </div>
                 </div>
                 <div class="col">
                     <div class="form-group">
                         <label for="end_date">End Date:</label>
-                        <input class="form-control" type="date" name="end_date" value="{{ training.end_date|date:'Y-m-d' }}" required>
+                        <input class="form-control" type="date" name="end_date" value="{{ training.end_date|date:'Y-m-d' }}" required><br>
                     </div>
                 </div>
             </div>

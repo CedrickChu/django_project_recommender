@@ -33,7 +33,6 @@ class EmployeeAdmin(admin.ModelAdmin):
     search_fields = ('first_name', 'middle_name', 'last_name', 'institution__Institution_name')
     
 
-
 class EmployeeHobbyInline(admin.TabularInline):
     model = EmployeeHobby
 
@@ -85,4 +84,4 @@ class EmployeeTrainingAdmin(admin.ModelAdmin):
 @admin.register(Project)
 class ProjectAdmin(admin.ModelAdmin):
     list_display = ('id', 'title', 'start_date', 'end_date')
-    filter_horizontal = ('required_skills',)
+    filter_horizontal = ('required_skills', 'preferred_hobbies', 'preferred_personalities')

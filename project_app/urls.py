@@ -13,6 +13,11 @@ urlpatterns = [
     path('add_employee/', views.add_employee, name='add_employee'),
     path('edit_training/<int:training_id>/', views.edit_training, name='edit_training'),
     path('add_training/', views.add_training, name='add_training'),
-    path('recommendation/<int:project_id>/', views.recommendation, name='recommend_employees'),
+    path('recommendation/<int:project_id>/', views.project_recommendations, name='employee_recommendation'),
+    path('projects/', views.ProjectListView.as_view(), name='project-list'),
+    path('projects/<int:pk>/', views.ProjectDetailView.as_view(), name='project_detail'),
+    path('edit_project/<int:project_id>/', views.edit_project, name='edit_project'),
+
+    
 ]
     

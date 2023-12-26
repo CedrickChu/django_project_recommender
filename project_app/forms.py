@@ -1,19 +1,18 @@
 # forms.py
 from django import forms
 
-from .models import Employees, Training
+from .models import Employees, Training, Project, Skill, Hobby, Personality
 
 
-class ProjectRecommenderForm(forms.Form):
-    project_name = forms.CharField(label='Project Name', max_length=100)
-    project_description = forms.CharField(label='Project Description', widget=forms.Textarea)
-    technology_stack = forms.CharField(label='Technology Stack', max_length=100)
-    project_budget = forms.DecimalField(label='Project Budget', decimal_places=2, max_digits=10)
-    team_size = forms.IntegerField(label='Team Size')
-    project_timeline = forms.IntegerField(label='Project Timeline (in weeks)')
+class ProjectForm(forms.Form):
+    class Meta:
+        model = Project
+        fields = '__all__'
 
-    required_skills = forms.CharField(label='Required Skills', max_length=255, help_text='Enter required skills separated by commas')
-    
+class TrainingForm(forms.ModelForm):
+    class Meta:
+        model = Training
+        fields = ['training_title', 'training_venue', 'training_type', 'start_date', 'end_date', 'institution']
 
 
 class EmployeeForm(forms.ModelForm):
@@ -21,7 +20,15 @@ class EmployeeForm(forms.ModelForm):
         model = Employees
         fields = '__all__' 
         
-class TrainingForm(forms.ModelForm):
+class ProjectForm(forms.ModelForm):
     class Meta:
-        model = Training
+        model = Project
         fields = '__all__'
+
+    def __init__(self, *args, **kwargs):
+        super(ProjectForm, self).__init__(*args, **kwargs)
+
+        self.fields['required_skills'].queryset = Skill.objects.all()
+        self.fields['preferred_personalities'].queryset = Personality.objects.all()
+        self.fields['relevant_hobbies'].queryset = Hobby.objects.all()
+        

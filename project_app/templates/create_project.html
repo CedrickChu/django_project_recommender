@@ -5,13 +5,13 @@
     <form method="post">
         {% csrf_token %}
         <label for="project_name">Project Name:</label>
-        <input class='form-control' type="text" id="project_name" name="project_name" required>
+        <input class='form-control' type="text" id="project_name" name="project_name" required><br>
 
         <label for="project_description">Project Description:</label>
-        <textarea class='form-control'  id="project_description" name="project_description" rows="4" required></textarea>
+        <textarea class='form-control'  id="project_description" name="project_description" rows="4" required></textarea><br>
 
         <label for="project_goals">Project Goals:</label>
-        <textarea class='form-control'  id="project_goals" name="project_goals" rows="4" required></textarea>
+        <textarea class='form-control'  id="project_goals" name="project_goals" rows="4" required></textarea><br>
 
         <button type="button" class='btn btn-fill btn-danger' id="add-skill-btn">Add Skill</button>
         <div id="skills-section">
@@ -20,26 +20,45 @@
                 {% for skill in skills %}
                     <option value="{{ skill.id }}">{{ skill.skill_type }}</option>
                 {% endfor %}
-            </select>
+            </select><br>
+        </div>
+        <div class='row'>
+            <div class='col'>
+                <button type="button" class="btn btn-fill btn-danger" id="add-hobby-btn">Add Hobby</button>
+                <div id="hobbies-section">
+                    <label for="relevant_hobbies">Relevant Hobbies:</label>
+                    <select class="form-control" id="relevant_hobbies" name="relevant_hobbies">
+                        {% for hobby in hobbies %}
+                            <option value="{{ hobby.id }}">{{ hobby.name }}</option>
+                        {% endfor %}
+                    </select><br>
+                </div>
+            </div>
+            <div class='col'>
+                <button type="button" class="btn btn-fill btn-danger" id="add-personality-btn">Add Personalities</button>
+                <div id="personalities-section">
+                    <label for="preferred_personality">Preferred Personalities:</label>
+                    <select class="form-control" id="preferred_personality" name="preferred_personality">
+                        {% for personality in personalities %}
+                            <option value="{{ personality.id }}">{{ personality.name }}</option>
+                        {% endfor %}
+                    </select><br>
+                </div>
+            </div>
         </div>
 
-        <button type="button" class="btn btn-fill btn-danger" id="add-hobby-btn">Add Hobby</button>
-        <div id="hobbies-section">
-            <label for="relevant_hobbies">Relevant Hobbies:</label>
-            <select class="form-control" id="relevant_hobbies" name="relevant_hobbies">
-                {% for hobby in hobbies %}
-                    <option value="{{ hobby.id }}">{{ hobby.name }}</option>
-                {% endfor %}
-            </select>
-        </div>
+        <div class='row'>
+            <div class='col'>
 
-
-        <label for="start_date">Start Date:</label>
-        <input class='form-control' type="date" id="start_date" name="start_date" required>
-
-        <label for="end_date">End Date:</label>
-        <input class='form-control' type="date" id="end_date" name="end_date" required>
-
+                <label for="start_date">Start Date:</label>
+                <input class='form-control' type="date" id="start_date" name="start_date" required>
+            </div>
+            <div class='col'>
+                <label for="end_date">End Date:</label>
+                <input class='form-control' type="date" id="end_date" name="end_date" required>
+            </div>
+        <div>
+        
         <button class='btn btn-fill btn-danger' type="submit">Submit</button>
     </form>
 </div>
@@ -51,15 +70,17 @@
         newSkillSelect.setAttribute('name', 'required_skills');
         newSkillSelect.setAttribute('class', 'form-control');
 
-        // Assuming you have the skills in a JavaScript array (skillsArray)
         {% for skill in skills %}
         var option = document.createElement('option');
         option.value = "{{ skill.id }}";
         option.text = "{{ skill.skill_type }}";
         newSkillSelect.appendChild(option);
         {% endfor %}
-
         skillsSection.appendChild(newSkillSelect);
+
+        // Add a line break after the select element
+        var br = document.createElement('br');
+        skillsSection.appendChild(br);
     });
 </script>
 
@@ -71,15 +92,39 @@
         newHobbySelect.setAttribute('name', 'relevant_hobbies');
         newHobbySelect.setAttribute('class', 'form-control');
 
-        // Assuming you have the hobbies in a JavaScript array (hobbiesArray)
         {% for hobby in hobbies %}
         var option = document.createElement('option');
         option.value = "{{ hobby.id }}";
         option.text = "{{ hobby.name }}";
         newHobbySelect.appendChild(option);
         {% endfor %}
-
         hobbiesSection.appendChild(newHobbySelect);
+
+        // Add a line break after the select element
+        var br = document.createElement('br');
+        hobbiesSection.appendChild(br);
+    });
+</script>
+
+<script>
+    document.getElementById('add-personality-btn').addEventListener('click', function(e) {
+        e.preventDefault();
+        var personalitiesSection = document.getElementById('personalities-section');
+        var newPersonalitySelect = document.createElement('select');
+        newPersonalitySelect.setAttribute('name', 'preferred_personality');
+        newPersonalitySelect.setAttribute('class', 'form-control');
+
+        {% for personality in personalities %}
+        var option = document.createElement('option');
+        option.value = "{{ personality.id }}";
+        option.text = "{{ personality.name }}";
+        newPersonalitySelect.appendChild(option);
+        {% endfor %}
+        personalitiesSection.appendChild(newPersonalitySelect);
+
+        // Add a line break after the select element
+        var br = document.createElement('br');
+        personalitiesSection.appendChild(br);
     });
 </script>
 {% endblock %}

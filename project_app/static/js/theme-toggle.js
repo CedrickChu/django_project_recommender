@@ -1,30 +1,29 @@
 document.addEventListener('DOMContentLoaded', function() {
     const themeToggleBtns = document.querySelectorAll('#theme-toggle');
-
-    const theme = localStorage.getItem('theme');
-    theme && document.body.classList.add(theme);
-
     const studentTable = document.getElementById("data-table");
-    const initialTableTheme = localStorage.getItem('tableTheme');
 
-    if (initialTableTheme) {
-        studentTable.classList.toggle("table-dark", initialTableTheme === 'table-dark');
+    // Apply initial theme from localStorage
+    const theme = localStorage.getItem('theme');
+    if (theme) {
+        document.body.classList.add(theme);
+        // Ensure table theme is synced with body theme
+        studentTable.classList.toggle("table-dark", theme !== 'light-mode');
     }
 
     const handleThemeToggle = () => {
-        document.body.classList.toggle('light-mode');
-        if (document.body.classList.contains('light-mode')) {
+        const isLightMode = document.body.classList.contains('light-mode');
+        // Toggle light-mode for the body
+        document.body.classList.toggle('light-mode', !isLightMode);
+
+        // Set localStorage and adjust table class accordingly
+        if (!isLightMode) {
             localStorage.setItem('theme', 'light-mode');
+            studentTable.classList.remove("table-dark");
+            localStorage.setItem('tableTheme', 'table-light');
         } else {
             localStorage.removeItem('theme');
-            document.body.classList.remove('light-mode');
-        }
-
-        if (studentTable) {
-            studentTable.classList.toggle("table-dark");
-
-            const isTableDark = studentTable.classList.contains("table-dark");
-            localStorage.setItem('tableTheme', isTableDark ? 'table-dark' : 'table-light');
+            studentTable.classList.add("table-dark");
+            localStorage.setItem('tableTheme', 'table-dark');
         }
     };
 

@@ -4,11 +4,14 @@ from django.shortcuts import render
 from django.core.paginator import Paginator
 from django.views import View
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Employees, Personality, Training, Institution, Project, Skill, Hobby, Employees, EmployeePersonality, EmployeeHobby, Hobby
+from .models import Employees, Personality, Training, Institution, Project, Skill, Hobby
 from .forms import EmployeeForm, TrainingForm
-from django.contrib import messages
-from .utils import ProjectEmployeeMatcher
+from .forms import ProjectForm
+from .utils import get_top_recommendations, calculate_score
 from django.http import HttpResponseRedirect
+from django.views.generic import ListView, DetailView
+
+
 
 class HomeView(TemplateView):
     template_name = 'base.html'
@@ -22,6 +25,8 @@ class PersonalityView(TemplateView):
         context['personalities'] = Personality.objects.all()
         return context
     
+    
+
 class EmployeeListView(View):
     template_name = 'employee_views.html'
     model = Employees
@@ -115,18 +120,14 @@ def add_training(request):
 def delete_employee(request, employee_id):
     employee = get_object_or_404(Employees, id=employee_id)
     return render(request, 'delete_employee.html', {'employee': employee})
-
-
-
-def create_project(request):
     
+def create_project(request):
     if request.method == 'POST':
         project_name = request.POST.get('project_name')
         project_description = request.POST.get('project_description')
         start_date = request.POST.get('start_date')
         end_date = request.POST.get('end_date')
-
-        # Create the project instance
+        
         project = Project.objects.create(
             title=project_name,
             description=project_description,
@@ -134,36 +135,58 @@ def create_project(request):
             end_date=end_date,
         )
 
-        # Handle required skills
         selected_skill_ids = request.POST.getlist('required_skills')
         for skill_id in selected_skill_ids:
             skill = Skill.objects.get(id=skill_id)
             project.required_skills.add(skill)
 
-        # Redirect to the recommendation view with the project ID
+        selected_personality_ids = request.POST.getlist('preferred_personality')
+        for personality_id in selected_personality_ids:
+            personality = Personality.objects.get(id=personality_id)
+            project.preferred_personalities.add(personality)
+
+        selected_hobby_ids = request.POST.getlist('relevant_hobbies')
+        for hobby_id in selected_hobby_ids:
+            hobby = Hobby.objects.get(id=hobby_id)
+            project.preferred_hobbies.add(hobby)
+
         return HttpResponseRedirect(f'/recommendation/{project.id}/')
 
-    return render(request, 'create_project.html', {'skills': Skill.objects.all(), 'hobbies': Hobby.objects.all()})
+    return render(request, 'create_project.html', {
+        'skills': Skill.objects.all(),
+        'personalities': Personality.objects.all(),
+        'hobbies': Hobby.objects.all(),
+    })
+    
 
-def recommendation(request, project_id):
+def project_recommendations(request, project_id):
     project = Project.objects.get(id=project_id)
-    recommended_employees = ProjectEmployeeMatcher.recommend_employees_for_project(project)
+    employees = Employees.objects.all()  
+    recommendations = get_top_recommendations(project, employees)
 
-    employee_details = []
-    for employee in recommended_employees:
-        # Calculate score (optional, as the original scoring logic might not apply now)
-        employee_skills = set(employee.skills.values_list('id', flat=True))
-        score = len(set(project.required_skills.values_list('id', flat=True)).intersection(employee_skills))
+    return render(request, 'project_recommendations.html', {
+        'project': project,
+        'recommendations': recommendations
+    })
+    
+class ProjectListView(ListView):
+    model = Project
+    template_name = 'project_list.html'
+    context_object_name = 'projects'
 
-        # Fetch personalities
-        personalities = EmployeePersonality.objects.filter(employee=employee).values_list('personality__name', flat=True)
-        hobbies = EmployeeHobby.objects.filter(employee=employee).values_list('hobby__name', flat=True)
 
-        employee_details.append({
-            'employee': employee, 
-            'score': score, 
-            'personalities': personalities, 
-            'hobbies': hobbies
-        })
-
-    return render(request, 'recommendation.html', {'project': project, 'recommended_employees': employee_details})
+class ProjectDetailView(DetailView):
+    model = Project
+    template_name = 'project_detail.html'
+    context_object_name = 'project'
+    
+def edit_project(request, project_id):
+    project = get_object_or_404(Project, pk=project_id)
+    if request.method == "POST":
+        form = ProjectForm(request.POST, instance=project)
+        if form.is_valid():
+            form.save()
+            return redirect('project_list')  # Redirect after POST
+    else:
+        form = ProjectForm(instance=project)
+    return render(request, 'edit_project.html', {'form': form})
