@@ -42,13 +42,17 @@ class Employees(models.Model):
 class EmployeeSkills(models.Model):
     employee = models.ForeignKey(Employees, on_delete=models.CASCADE)
     skill = models.ForeignKey(Skill, on_delete=models.CASCADE, primary_key=True)
-    skill_level = models.CharField(max_length=250)
+    skill_level = models.ForeignKey('EmployeeSkillLevel', on_delete=models.CASCADE)
     
     class Meta:
         unique_together = ('employee', 'skill')
 
     def __str__(self):
         return f"{self.employee} - {self.skill} - {self.skill_level}"
+    
+class EmployeeSkillLevel(models.Model):
+    level_name = models.CharField(max_length=50)
+
 
 
 class EmployeeHobby(models.Model):

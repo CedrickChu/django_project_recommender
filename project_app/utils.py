@@ -1,11 +1,34 @@
+from .models import EmployeeSkills
+
+
+def get_skill_level_score(skill_level_name):
+    level_scores = {
+        'Beginner': 1,
+        'Intermediate': 2,
+        'Advanced': 3,
+        'Professional': 4
+    }
+    return level_scores.get(skill_level_name, 0)
+
 def calculate_score(employee, project):
-    skill_weight = 1.5
+    skill_weight = 1.25
     personality_weight = 0.2
     hobbies_weight = 0.5
 
     total_skills = len(project.required_skills.all())
-    employee_skills = employee.skills.filter(id__in=project.required_skills.values_list('id', flat=True))
-    skill_score = (len(employee_skills) / total_skills) * 100 * skill_weight if total_skills > 0 else 0
+    
+    employee_skill_levels = EmployeeSkills.objects.filter(
+        employee=employee, 
+        skill__in=project.required_skills.all()
+    )
+
+    skill_score = 0
+    for employee_skill_level in employee_skill_levels:
+        skill_level_score = get_skill_level_score(employee_skill_level.skill_level.level_name)
+        skill_score += skill_level_score
+
+    # Calculate the average skill score
+    skill_score = (skill_score / total_skills) * 100 * skill_weight if total_skills > 0 else 0
 
     if employee.personality:
         personality_score = 100 * personality_weight if employee.personality in project.preferred_personalities.all() else 0

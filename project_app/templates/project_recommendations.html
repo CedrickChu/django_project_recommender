@@ -38,6 +38,13 @@
                         {% endfor %}
                     </tbody>
                 </table>
+                <div class="matplotlib-plot" style='margin-bottom: 20px;'>
+                    {% if graphic %}
+                        <img src="data:image/png;base64,{{ graphic }}" alt="Matplotlib Plot">
+                    {% else %}
+                        <p>No plot available.</p>
+                    {% endif %}
+                </div>
             {% else %}
                 <p>No recommendations available.</p>
             {% endif %}

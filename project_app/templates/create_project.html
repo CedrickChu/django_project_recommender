@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block body %}
 <div class='content-center' style='width:70%; margin: auto;'>
-    <h1>Project Description</h1>
+    <h1>CREATE PROJECT</h1>
     <form method="post">
         {% csrf_token %}
         <label for="project_name">Project Name:</label>
@@ -58,10 +58,11 @@
                 <input class='form-control' type="date" id="end_date" name="end_date" required>
             </div>
         <div>
-        
+        <br>
         <button class='btn btn-fill btn-danger' type="submit">Submit</button>
     </form>
 </div>
+<table id='data-table'></table>
 <script>
     document.getElementById('add-skill-btn').addEventListener('click', function(e) {
         e.preventDefault();

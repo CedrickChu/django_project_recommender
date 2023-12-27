@@ -1,9 +1,9 @@
 from django.urls import path
-from .views import HomeView, EmployeeListView, PersonalityView, TrainingView
+from .views import EmployeeListView, PersonalityView, TrainingView
 from . import views
 
 urlpatterns = [
-    path('', HomeView.as_view(), name='home_view'),
+    path('', views.employee_dashboard, name='home_view'),
     path('create_project/', views.create_project, name='project_view'),
     path('employee/', EmployeeListView.as_view(), name='employee_view'),
     path('personality/', PersonalityView.as_view(), name='personality_view'),
@@ -17,7 +17,5 @@ urlpatterns = [
     path('projects/', views.ProjectListView.as_view(), name='project-list'),
     path('projects/<int:pk>/', views.ProjectDetailView.as_view(), name='project_detail'),
     path('edit_project/<int:project_id>/', views.edit_project, name='edit_project'),
-
-    
 ]
     

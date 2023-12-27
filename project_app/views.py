@@ -10,11 +10,36 @@ from .forms import ProjectForm
 from .utils import get_top_recommendations, calculate_score
 from django.http import HttpResponseRedirect
 from django.views.generic import ListView, DetailView
+import matplotlib.pyplot as plt
+import base64
+from io import BytesIO
+import json
 
+def employee_dashboard(request):
+    personalities = Personality.objects.all()
+    employee_counts = [Employees.objects.filter(personality=personality).count() for personality in personalities]
 
+    # Define colors for the chart
+    colors = [
+        'rgba(255, 99, 132, 0.7)', 'rgba(54, 162, 235, 0.7)', 
+        'rgba(255, 206, 86, 0.7)', 'rgba(75, 192, 192, 0.7)', 
+        'rgba(153, 102, 255, 0.7)', 'rgba(255, 159, 64, 0.7)',
+        'rgba(199, 99, 132, 0.7)', 'rgba(164, 162, 235, 0.7)', 
+        'rgba(205, 206, 86, 0.7)', 'rgba(175, 192, 192, 0.7)', 
+        'rgba(133, 102, 255, 0.7)', 'rgba(215, 159, 64, 0.7)',
+        'rgba(255, 129, 102, 0.7)', 'rgba(34, 162, 235, 0.7)', 
+        'rgba(255, 216, 86, 0.7)', 'rgba(85, 192, 192, 0.7)'
+    ]
 
-class HomeView(TemplateView):
-    template_name = 'base.html'
+    chart_data = {
+        'labels': [personality.name for personality in personalities],
+        'data': employee_counts,
+        'backgroundColor': colors[:len(personalities)]
+    }
+
+    chart_data_json = json.dumps(chart_data)
+
+    return render(request, 'employee_dashboard.html', {'chart_data_json': chart_data_json})
 
 class PersonalityView(TemplateView):
     template_name = 'personality_views.html'
@@ -164,9 +189,31 @@ def project_recommendations(request, project_id):
     employees = Employees.objects.all()  
     recommendations = get_top_recommendations(project, employees)
 
+    employee_names = [recommendation['employee'].last_name for recommendation in recommendations]
+    total_scores = [recommendation['total_score'] for recommendation in recommendations]
+
+    plt.figure(figsize=(15, 15))
+    plt.bar(employee_names, total_scores)
+    plt.title('Employee Recommendation Scores')
+    plt.xlabel('Employees')
+    plt.ylabel('Scores')
+
+    # Rotate the x-axis labels vertically
+    plt.xticks(rotation=-90)
+
+    buffer = BytesIO()
+    plt.savefig(buffer, format='png')
+    buffer.seek(0)
+
+    image_png = buffer.getvalue()
+    buffer.close()
+    graphic = base64.b64encode(image_png)
+    graphic = graphic.decode('utf-8')
+
     return render(request, 'project_recommendations.html', {
         'project': project,
-        'recommendations': recommendations
+        'recommendations': recommendations,
+        'graphic': graphic
     })
     
 class ProjectListView(ListView):
