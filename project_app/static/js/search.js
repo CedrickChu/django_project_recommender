@@ -1,10 +1,12 @@
+$(document).ready(function () {
+    var allRows = $("#record-table tr");
 
-$(document).ready(function(){
-    $("#searchInput").on("keyup", function() {
+    $("#searchInput").on("keyup", function () {
         var value = $(this).val().toLowerCase();
-        $("#record-table tr").filter(function() {
-        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-        });
+        allRows.hide();
+        
+        allRows.filter(function () {
+            return $(this).text().toLowerCase().indexOf(value) > -1;
+        }).show();
     });
 });
-                

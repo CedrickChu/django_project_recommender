@@ -6,7 +6,6 @@
         <h2>Edit Employee</h2>
         <form method="post" action="">
             {% csrf_token %}
-            
             <div class="row">
                 <div class="col">
                     <div class="form-group">
@@ -16,13 +15,33 @@
                 </div>
                 <div class="col">
                     <div class="form-group">
+                        <label for="middle_name">Middle Name:</label>
+                        <input class="form-control" type="text" name="middle_name" value="{{ employee.middle_name }}"><br>
+                    </div>
+                </div>
+            </div>
+            <div class='row'>
+                <div class="col">
+                    <div class="form-group">
                         <label for="last_name">Last Name:</label>
                         <input class="form-control" type="text" name="last_name" value="{{ employee.last_name }}" required><br>
                     </div>
                 </div>
+                <div class='col'>
+                    <div class="form-group">
+                        <label for="personality">Personality:</label>
+                        <select class="form-control" name="personality" required>
+                            {% for personality in personalities %}
+                                <option value="{{ personality.id }}" {% if employee.personality.id == personality.id %}selected{% endif %}>
+                                    {{ personality.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
             </div>
 
-            <div class="form-group">
+            <div class="form-group text-center">
                 <label for="institution">Institution:</label>
                 <select class="form-control" name="institution" required>
                     {% for institution in institutions %}
@@ -33,21 +52,71 @@
                 </select><br>
             </div>
 
-            <div class="form-group">
-                <label for="personality">Personality:</label>
-                <select class="form-control" name="personality" required>
-                    {% for personality in personalities %}
-                        <option value="{{ personality.id }}" {% if employee.personality.id == personality.id %}selected{% endif %}>
-                            {{ personality.name }}
-                        </option>
-                    {% endfor %}
-                </select>
-            </div>
-            <br>
+            <div class="form-group" style='width:49%;' >
+                <button type="button" class='btn btn-fill btn-danger' id="add-skill-btn">Add Skill</button>
+                <div id="skills-section">
+                    <label for="required_skills">Required Skills:</label>
+                </div>
+            </div> <br> <br>
+           
             <button type="submit" style='margin-right:20px;' class="btn btn-danger">Save Changes</button>
             <a href="{% url 'employee_view' %}" class="btn btn-secondary">Cancel</a>
         </form>
     </div>
 </div>
 <table id='data-table'></table>
+    {% block scripts %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var skillsSection = document.getElementById('skills-section');
+    
+            function createSkillSelect(selectedSkillId = null) {
+                var newSkillSelect = document.createElement('select');
+                newSkillSelect.setAttribute('name', 'required_skills[]');
+                newSkillSelect.setAttribute('class', 'form-control text-center');
+    
+                {% for skill in skills %}
+                    var option = document.createElement('option');
+                    option.value = "{{ skill.id }}";
+                    option.text = "{{ skill.skill_type }}";
+                    if (selectedSkillId == "{{ skill.id }}") {
+                        option.selected = true;
+                    }
+                    newSkillSelect.appendChild(option);
+                {% endfor %}
+    
+                return newSkillSelect;
+            }
+    
+            function addSkillSelect(selectedSkillId = null) {
+                var skillContainer = document.createElement('div');
+                skillContainer.setAttribute('class', 'skill-container');
+                var newSkillSelect = createSkillSelect(selectedSkillId);
+                skillContainer.appendChild(newSkillSelect);
+    
+                var removeButton = document.createElement('button');
+                removeButton.innerHTML = 'Remove';
+                removeButton.setAttribute('type', 'button');
+                removeButton.setAttribute('class', 'btn btn-danger btn-sm');
+                removeButton.addEventListener('click', function() {
+                    skillsSection.removeChild(skillContainer);
+                });
+                skillContainer.appendChild(removeButton);
+    
+                skillsSection.appendChild(skillContainer);
+                skillsSection.appendChild(document.createElement('br'));
+            }
+    
+            {% for skill in employee.skills.all %}
+                addSkillSelect("{{ skill.id }}");
+            {% endfor %}
+    
+            document.getElementById('add-skill-btn').addEventListener('click', function(e) {
+                e.preventDefault();
+                addSkillSelect();
+            });
+        });
+    </script>
+    {% endblock %}
+
 {% endblock %}

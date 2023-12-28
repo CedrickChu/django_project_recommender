@@ -29,7 +29,7 @@ class InstitutionAdmin(admin.ModelAdmin):
 @admin.register(Employees)
 class EmployeeAdmin(admin.ModelAdmin):
     form = EmployeeForm
-    list_display = ('first_name', 'middle_name', 'last_name', 'institution', 'personality')
+    list_display = ('first_name', 'middle_name', 'last_name', 'institution', 'personality',)
     search_fields = ('first_name', 'middle_name', 'last_name', 'institution__Institution_name')
     
 
@@ -49,6 +49,7 @@ class EmployeeTrainingInline(admin.TabularInline):
 class EmployeeHobbyAdmin(admin.ModelAdmin):
     list_display = ('employee', 'get_hobby_names')
     search_fields = ('employee__first_name', 'employee__last_name', 'hobby__name')
+    list_filter = ('hobby',)
 
     def get_hobby_names(self, obj):
         return ", ".join([str(hobby.name) for hobby in obj.employee.hobbies.all()])

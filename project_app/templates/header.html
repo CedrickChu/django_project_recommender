@@ -1,55 +1,46 @@
 {% load static %}
 <header class="header container">
-      <ul class="header-items">
-        <li class="header-items">
-            <button id="button-menu" class="navbar-toggler toggler-example" onclick="toggleMenu()"  >&#9776;
-            <div class="sidebar" id="mySidebar">
-                <div class="logo text-center">
-                    <a class="navbar-brand" href="https://github.com/CedrickChu">
-                    <img src="{% static 'images/chu.png' %}" alt="My Logo" width="80" height="80">
+    <nav>
+        <ul class="header-items">
+            <li>
+                <button id="button-menu" class="navbar-toggler toggler-example" onclick="toggleMenu()"  >&#9776;
+                <div class="sidebar" id="mySidebar">
+                    <div class="logo text-center">
+                        <a class="navbar-brand" href="https://github.com/CedrickChu">
+                        <img src="{% static 'images/chu.png' %}" alt="My Logo" width="80" height="80">
+                    </div>
+                    <a href="{% url 'home_view' %}">DASHBOARD</a>
+                    <a href="{% url 'employee_view' %}">EMPLOYEE</a>
+                    <a href="{% url 'personality_view' %}">PERSONALITY</a>
+                    <a href="{% url 'training_view' %}">TRAINING</a>
+                    <a href="{% url 'project_view' %}">CREATE PROJECT</a>
+                    <a href="{% url 'project-list' %}">PROJECT LIST</a>
                 </div>
-                <a href="#">DASHBOARD</a>
-                <a href="{% url 'employee_view' %}">EMPLOYEE</a>
-                <a href="{% url 'personality_view' %}">PERSONALITY</a>
-                <a href="{% url 'training_view' %}">TRAINING</a>
-                <a href="{% url 'project_view' %}">CREATE PROJECT</a>
-                <a href="{% url 'project-list' %}">PROJECT LIST</a>
-            </div>
-            <div id="overlay" onclick="w3_open()">
-              <script src="{% static 'js/sidebar.js' %}"></script>
-            </div>
-        </li>
-        <nav>
-            <ul class="header-items">
-              <ul>
-                  <input class="form-control" id="searchInput" type="text" placeholder="Search.."style="border: 2px solid #808080;">
-              </ul>
-                <li>
-                    <button
-                      aria-label="theme-toggle btn"
-                      id="theme-toggle"
-                      class="theme_mode"
-                    >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-moon-stars-fill" viewBox="0 0 16 16">
-                        <path d="M6 .278a.768.768 0 0 1 .08.858 7.208 7.208 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277.527 0 1.04-.055 1.533-.16a.787.787 0 0 1 .81.316.733.733 0 0 1-.031.893A8.349 8.349 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.752.752 0 0 1 6 .278"/>
-                        <path d="M10.794 3.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387a1.734 1.734 0 0 0-1.097 1.097l-.387 1.162a.217.217 0 0 1-.412 0l-.387-1.162A1.734 1.734 0 0 0 9.31 6.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387a1.734 1.734 0 0 0 1.097-1.097l.387-1.162zM13.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.156 1.156 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.156 1.156 0 0 0-.732-.732l-.774-.258a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732L13.863.1z"/>
-                      </svg>
-                    </button>
-                  </li>
-            </ul>
-            <button aria-label="mobile nav button" class="header-menu-button">
-                <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                >
-                <path
-                    fill-rule="evenodd"
-                    d="M3 6.75A.75.75 0 013.75 6h16.5a.75.75 0 010 1.5H3.75A.75.75 0 013 6.75zM3 12a.75.75 0 01.75-.75h16.5a.75.75 0 010 1.5H3.75A.75.75 0 013 12zm0 5.25a.75.75 0 01.75-.75h16.5a.75.75 0 010 1.5H3.75a.75.75 0 01-.75-.75z"
-                    clip-rule="evenodd"
-                />
-                </svg>
-            </button>
-        </nav>
-          
+                <div id="overlay" onclick="w3_open()">
+                <script src="{% static 'js/sidebar.js' %}"></script>
+                </div>
+            </li>
+            <li>
+                <input class="form-control" id="searchInput" type="text" placeholder="Search.."style="border: 2px solid #808080;">
+            </li>   
+            <li>
+                <button aria-label="theme-toggle btn" id="theme-toggle" class="theme_mode">
+                    <img src="static/images/sun.png" alt="Sun Icon">
+                </button>
+            </li>
+        </ul>
+        <button aria-label="mobile nav button" class="header-menu-button">
+            <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            >
+            <path
+                fill-rule="evenodd"
+                d="M3 6.75A.75.75 0 013.75 6h16.5a.75.75 0 010 1.5H3.75A.75.75 0 013 6.75zM3 12a.75.75 0 01.75-.75h16.5a.75.75 0 010 1.5H3.75A.75.75 0 013 12zm0 5.25a.75.75 0 01.75-.75h16.5a.75.75 0 010 1.5H3.75a.75.75 0 01-.75-.75z"
+                clip-rule="evenodd"
+            />
+            </svg>
+        </button>
+    </nav>   
 </header>

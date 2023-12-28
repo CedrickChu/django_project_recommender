@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<div class="content-center">
+    <div class="container container-fluid mx-auto">
+        <h2 style='font-weight:bolder;color:white;'>Delete Employee</h2>
+        <form method="post" style="display:inline;">
+            {% csrf_token %}
+            <label  for="delete_confirmation" style='font-weight:bolder; font-size: 20px; color:white;'>Are you sure you want to delete employee "{{ employee }}"?</label>
+            <input type="checkbox" id="delete_confirmation" style='margin-left: 10px;' name="delete_confirmation" required><br>
+            <input class="col-md-4 btn btn-danger" type="submit" value="Confirm">
+        </form>
+    </div>
+</div>
+{% endblock %}

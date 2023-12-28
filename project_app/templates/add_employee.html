@@ -6,43 +6,102 @@
         <h2>Add Employee</h2>
         <form method="post" action="">
             {% csrf_token %}
-            
             <div class="row">
                 <div class="col">
                     <div class="form-group">
                         <label for="first_name">First Name:</label>
-                        <input class="form-control" type="text" name="first_name" value="" required><br>
+                        <input class="form-control" type="text" name="first_name" required><br>
                     </div>
                 </div>
                 <div class="col">
                     <div class="form-group">
-                        <label for="last_name">Last Name:</label>
-                        <input class="form-control" type="text" name="last_name" value="" required><br>
+                        <label for="middle_name">Middle Name:</label>
+                        <input class="form-control" type="text" name="middle_name"><br>
                     </div>
                 </div>
             </div>
-
-            <div class="form-group">
-                <label for="institution">Institution:</label>
-                <select class="form-control" name="institution" required>
-                    {% for institution in institutions %}
-                        <option value="{{ institution.id }}">{{ institution.Institution_name }}</option>
-                    {% endfor %}
-                </select><br>
+            <div class="row">
+                <div class="col">
+                    <div class="form-group">
+                        <label for="last_name">Last Name:</label>
+                        <input class="form-control" type="text" name="last_name"><br>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-group">
+                        <label for="institution">Institution:</label>
+                        <select class="form-control" name="institution" required>
+                            {% for institution in institutions %}
+                                <option value="{{ institution.id }}">{{ institution.Institution_name }}</option>
+                            {% endfor %}
+                        </select><br>
+                    </div>
+                </div>
             </div>
-
-            <div class="form-group">
+           
+                
+            <div class="form-group" style='width:49%;' >
                 <label for="personality">Personality:</label>
-                <select class="form-control" name="personality" required>
+                <select class="form-control text-center" name="personality" required>
                     {% for personality in personalities %}
                         <option value="{{ personality.id }}">{{ personality.name }}</option>
                     {% endfor %}
                 </select>
+            </div><br>
+    
+        
+            <div class="form-group" style='width:49%;' >
+                <button type="button" class='btn btn-fill btn-danger' id="add-skill-btn">Add Skill</button>
+                <div id="skills-section">
+                    <label for="required_skills">Required Skills:</label>
+                    <select class="form-control text-center" name="required_skills[]" id="required_skills">
+                        {% for skill in skills %}
+                            <option value="{{ skill.id }}">{{ skill.skill_type }}</option>
+                        {% endfor %}
+                    </select><br><br>
+                </div>
             </div>
+             
             <br>
             <button type="submit" style='margin-right:20px;' class="btn btn-danger">Add Employee</button>
             <a href="{% url 'employee_view' %}" class="btn btn-secondary">Cancel</a>
         </form>
     </div>
 </div>
+<table id='data-table'></table> 
+<script>
+    document.getElementById('add-skill-btn').addEventListener('click', function(e) {
+        e.preventDefault();
+        var skillsSection = document.getElementById('skills-section');
+
+        var skillContainer = document.createElement('div');
+        skillContainer.setAttribute('class', 'skill-container');
+
+        var newSkillSelect = document.createElement('select');
+        newSkillSelect.setAttribute('name', 'required_skills[]');
+        newSkillSelect.setAttribute('class', 'form-control text-center');
+
+        {% for skill in skills %}
+            var option = document.createElement('option');
+            option.value = "{{ skill.id }}";
+            option.text = "{{ skill.skill_type }}";
+            newSkillSelect.appendChild(option);
+        {% endfor %}
+
+        var removeButton = document.createElement('button');
+        removeButton.innerHTML = 'Remove';
+        removeButton.setAttribute('type', 'button');
+        removeButton.setAttribute('class', 'btn btn-danger btn-sm');
+        removeButton.addEventListener('click', function() {
+            skillsSection.removeChild(skillContainer);
+        });
+
+        skillContainer.appendChild(newSkillSelect);
+        skillContainer.appendChild(removeButton);
+        skillsSection.appendChild(skillContainer);
+
+        var br = document.createElement('br');
+        skillsSection.appendChild(br);
+    });
+</script>
 {% endblock %}

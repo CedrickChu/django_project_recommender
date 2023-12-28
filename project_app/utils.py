@@ -11,7 +11,7 @@ def get_skill_level_score(skill_level_name):
     return level_scores.get(skill_level_name, 0)
 
 def calculate_score(employee, project):
-    skill_weight = 1.25
+    skill_weight = 1.5
     personality_weight = 0.2
     hobbies_weight = 0.5
 
@@ -27,7 +27,6 @@ def calculate_score(employee, project):
         skill_level_score = get_skill_level_score(employee_skill_level.skill_level.level_name)
         skill_score += skill_level_score
 
-    # Calculate the average skill score
     skill_score = (skill_score / total_skills) * 100 * skill_weight if total_skills > 0 else 0
 
     if employee.personality:

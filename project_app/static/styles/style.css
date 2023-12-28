@@ -103,3 +103,15 @@ table {
     background-color: ""!important;
   }
  
+  .page-item a:hover {
+    background-color: #e94f4f!important;
+    color: black!important;
+  }
+  .active>.page-link{
+    background-color: rgb(224, 253, 255)!important;
+    color: black!important;
+  }
+  .disabled>.page-link{
+    background-color: #38405F!important;
+    
+}

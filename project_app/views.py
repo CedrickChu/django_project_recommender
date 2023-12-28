@@ -1,25 +1,28 @@
 # views.py
 from django.views.generic import TemplateView
-from django.shortcuts import render
-from django.core.paginator import Paginator
-from django.views import View
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Employees, Personality, Training, Institution, Project, Skill, Hobby
+from .models import Employees, Personality, Training, Institution, Project, Skill, Hobby, EmployeeSkills, EmployeeSkillLevel
+from django.urls import reverse_lazy
+from django.views.generic.edit import DeleteView
+from django.contrib import messages
 from .forms import EmployeeForm, TrainingForm
 from .forms import ProjectForm
-from .utils import get_top_recommendations, calculate_score
+from .utils import get_top_recommendations
 from django.http import HttpResponseRedirect
 from django.views.generic import ListView, DetailView
 import matplotlib.pyplot as plt
 import base64
 from io import BytesIO
 import json
+import logging
+from django.db import transaction
+
+logger = logging.getLogger(__name__)
 
 def employee_dashboard(request):
     personalities = Personality.objects.all()
     employee_counts = [Employees.objects.filter(personality=personality).count() for personality in personalities]
 
-    # Define colors for the chart
     colors = [
         'rgba(255, 99, 132, 0.7)', 'rgba(54, 162, 235, 0.7)', 
         'rgba(255, 206, 86, 0.7)', 'rgba(75, 192, 192, 0.7)', 
@@ -50,39 +53,17 @@ class PersonalityView(TemplateView):
         context['personalities'] = Personality.objects.all()
         return context
     
-    
-
-class EmployeeListView(View):
+class EmployeeListView(ListView):
     template_name = 'employee_views.html'
     model = Employees
     context_object_name = 'employees'
-    paginate_by = 10
+    paginate_by = 8
 
-    def get(self, request, *args, **kwargs):
-        all_employees = self.model.objects.all()
-        paginator = Paginator(all_employees, self.paginate_by)
-        page = request.GET.get('page')
-        employees = paginator.get_page(page)
-
-        context = {'employees': employees, 'currentpage': int(page) if page else 1, 'totalPages': paginator.num_pages}
-        return render(request, self.template_name, context)
-    
-
-class TrainingView(TemplateView):
-    template_name = 'training_views.html'
+class TrainingList(ListView):
+    model = Training
     context_object_name = 'trainings'
-    paginate_by = 10  
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        all_trainings = Training.objects.all()
-        paginator = Paginator(all_trainings, self.paginate_by)
-        page = self.request.GET.get('page')
-        trainings = paginator.get_page(page)
-        context['trainings'] = trainings
-        context['currentpage'] = int(page) if page else 1
-        context['totalPages'] = paginator.num_pages
-        return context
-
+    template_name = 'training_views.html'
+    paginate_by = 8
 
 def edit_employee(request, employee_id):
     employee = get_object_or_404(Employees, id=employee_id)
@@ -90,38 +71,77 @@ def edit_employee(request, employee_id):
     if request.method == 'POST':
         form = EmployeeForm(request.POST, instance=employee)
         if form.is_valid():
-            form.save()
-            return redirect('employee_list')
+            saved_employee = form.save(commit=False)
+            form.save_m2m()
+            saved_employee.save()
+
+            # Clear existing skills for this employee
+            EmployeeSkills.objects.filter(employee=saved_employee).delete()
+
+            # Add new skills
+            skill_ids = request.POST.getlist('required_skills[]')
+            beginner_level = EmployeeSkillLevel.objects.get(level_name='Beginner')
+            for skill_id in skill_ids:
+                skill = Skill.objects.get(id=skill_id)
+                EmployeeSkills.objects.create(employee=saved_employee, skill=skill, skill_level=beginner_level)
+
+            messages.success(request, 'Employee edited successfully!')
+            return redirect('employee_view')
     else:
         form = EmployeeForm(instance=employee)
 
-    institutions = Institution.objects.all()  
-    personalities = Personality.objects.all()  
+    institutions = Institution.objects.all().order_by('Institution_name')
+    personalities = Personality.objects.all().order_by('name')
+    skills = Skill.objects.all().order_by('skill_type')
+    
+    current_skills = employee.skills.all()
 
-    return render(request, 'edit_employee.html', {'form': form, 'employee': employee, 'institutions': institutions, 'personalities': personalities})
+    context = {
+        'form': form,
+        'employee': employee,
+        'institutions': institutions,
+        'personalities': personalities,
+        'skills': skills,
+        'current_skills': current_skills, 
+    }
+
+    return render(request, 'edit_employee.html', context)
 
 def add_employee(request):
     if request.method == 'POST':
         form = EmployeeForm(request.POST)
         if form.is_valid():
-            form.save()
-            return redirect('employee_list')
+            employee = form.save(commit=False)
+            employee.save()
+
+            skill_ids = request.POST.getlist('required_skills[]')
+            beginner_level = EmployeeSkillLevel.objects.get(level_name='Beginner')
+
+            for skill_id in skill_ids:
+                skill = Skill.objects.get(id=skill_id)
+                EmployeeSkills.objects.create(employee=employee, skill=skill, skill_level=beginner_level)
+
+            messages.success(request, 'Employee added successfully!')
+            return redirect('employee_view')
+        else:
+            logger.warning(f"Form is not valid: {form.errors}")
     else:
         form = EmployeeForm()
 
-    institutions = Institution.objects.all()
-    personalities = Personality.objects.all()
+    institutions = Institution.objects.all().order_by('Institution_name')
+    personalities = Personality.objects.all().order_by('name')
+    skills = Skill.objects.all().order_by('skill_type')
 
-    return render(request, 'add_employee.html', {'form': form, 'institutions': institutions, 'personalities': personalities})
+    return render(request, 'add_employee.html', {'form': form, 'institutions': institutions, 'personalities': personalities, 'skills': skills})
 
 def edit_training(request, training_id):
     training = get_object_or_404(Training, id=training_id)
-
     if request.method == 'POST':
         form = TrainingForm(request.POST, instance=training)
         if form.is_valid():
             form.save()
-            return redirect('training_list')
+            messages.success(request, 'Training edited successfully!')
+            return redirect('training_view')
     else:
         form = TrainingForm(instance=training)
         
@@ -134,7 +154,8 @@ def add_training(request):
         form = TrainingForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('training_list')
+            messages.success(request, 'Training added successfully!')
+            return redirect('training_view')
     else:
         form = TrainingForm()
 
@@ -142,9 +163,27 @@ def add_training(request):
 
     return render(request, 'add_training.html', {'form': form, 'institutions': institutions})
 
-def delete_employee(request, employee_id):
-    employee = get_object_or_404(Employees, id=employee_id)
-    return render(request, 'delete_employee.html', {'employee': employee})
+class EmployeeDeleteView(DeleteView):
+    model = Employees
+    template_name = 'delete_employee.html'
+    context_object_name = 'employee'
+    success_url = reverse_lazy('employee_view')
+
+    def delete(self, request, *args, **kwargs):
+        response = super().delete(request, *args, **kwargs)
+        messages.success(self.request, 'Employee deleted successfully!')
+        return response
+    
+class TrainingDeleteView(DeleteView):
+    model = Training
+    template_name = 'delete_training.html'
+    context_object_name = 'training'
+    success_url = reverse_lazy('training_view')
+
+    def delete(self, request, *args, **kwargs):
+        response = super().delete(request, *args, **kwargs)
+        messages.success(self.request, 'Training deleted successfully!')
+        return response
     
 def create_project(request):
     if request.method == 'POST':
@@ -176,11 +215,15 @@ def create_project(request):
             project.preferred_hobbies.add(hobby)
 
         return HttpResponseRedirect(f'/recommendation/{project.id}/')
+    
+    skills = Skill.objects.all().order_by('skill_type')
+    personalities = Personality.objects.all().order_by('name')
+    hobbies = Hobby.objects.all().order_by('name')
 
     return render(request, 'create_project.html', {
-        'skills': Skill.objects.all(),
-        'personalities': Personality.objects.all(),
-        'hobbies': Hobby.objects.all(),
+        'skills': skills,
+        'personalities': personalities,
+        'hobbies': hobbies,
     })
     
 
@@ -198,7 +241,6 @@ def project_recommendations(request, project_id):
     plt.xlabel('Employees')
     plt.ylabel('Scores')
 
-    # Rotate the x-axis labels vertically
     plt.xticks(rotation=-90)
 
     buffer = BytesIO()
@@ -227,13 +269,3 @@ class ProjectDetailView(DetailView):
     template_name = 'project_detail.html'
     context_object_name = 'project'
     
-def edit_project(request, project_id):
-    project = get_object_or_404(Project, pk=project_id)
-    if request.method == "POST":
-        form = ProjectForm(request.POST, instance=project)
-        if form.is_valid():
-            form.save()
-            return redirect('project_list')  # Redirect after POST
-    else:
-        form = ProjectForm(instance=project)
-    return render(request, 'edit_project.html', {'form': form})

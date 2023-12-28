@@ -1,8 +1,9 @@
 # forms.py
 from django import forms
 
-from .models import Employees, Training, Project, Skill, Hobby, Personality
-
+from .models import Employees, Training, Project, Skill, Hobby, Personality, EmployeeHobby
+from django.contrib.admin.widgets import FilteredSelectMultiple
+from django import forms
 
 class ProjectForm(forms.Form):
     class Meta:
@@ -18,7 +19,7 @@ class TrainingForm(forms.ModelForm):
 class EmployeeForm(forms.ModelForm):
     class Meta:
         model = Employees
-        fields = '__all__' 
+        fields = ['first_name','middle_name', 'last_name', 'institution', 'personality'] 
         
 class ProjectForm(forms.ModelForm):
     class Meta:

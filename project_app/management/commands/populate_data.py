@@ -52,11 +52,9 @@ class Command(BaseCommand):
         employees = Employees.objects.all()
 
         for employee in employees:
-            # Randomly select hobbies for the employee
             selected_hobbies = random.sample(list(Hobby.objects.all()), k=random.randint(1, len(hobbies_data)))
             employee.hobbies.set(selected_hobbies)
 
-            # Randomly select ONE personality for the employee using random.choice
             selected_personality = random.choice(list(Personality.objects.all()))
             employee.personalities.set([selected_personality])
 

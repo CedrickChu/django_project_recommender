@@ -15,6 +15,7 @@
     display: block;
 }
 
+
 /* xs
 @media (min-width: 475px) {
     
@@ -47,10 +48,9 @@
         transition: color 0.4s;
     }
     .theme_mode{
+        display: block;
         width: var(--size-base);
-        height: var(--size-base);
-        color: white;
-        display: inline-block;
+        height: var(--size-base);            
     }
     .seperator{
         border: .5px solid var(--clr-light);
@@ -145,10 +145,18 @@
 } 
 
 
-/*  lg */
-/* @media (min-width: 1024px) {
+
+@media (min-width: 1024px) 
+{
+    .theme_mode{
+        display: block;
+        width: var(--size-base);
+        height: var(--size-base);
+        color: black!important;
+
+    }
+}
     
-} */
 /*  xL */
 /* @media (min-width: 1280px) {
     
